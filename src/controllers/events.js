@@ -19,4 +19,14 @@ export const getEventByIdController = async (req, res) => {
         data: events,
     });
 };
+export const createEventController = async (req, res) => {
+    const eventId = req.params.eventId;
+    const events = await getEventById(eventId);
+
+    res.json({
+        status: 200,
+        message: `Successfully found event with id ${eventId} not found!`,
+        data: events,
+    });
+};
 
