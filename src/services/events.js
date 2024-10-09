@@ -14,3 +14,28 @@ export const getEventById = async (id) => {
 
   return event;
 };
+export const createEvent = async (payload) => {
+  const event = await Events.create(payload);
+
+  return event;
+};
+export const upsertEvent = async (id, payload, options = {}) => {
+  const rawResult = await Events.findByIdAndUpdate(id, payload, {
+    new: true,
+    includeResultMetadata: true,
+    ...options,
+  });
+
+  if (!rawResult || !rawResult.value) {
+    throw createHttpError(404, 'Event not found');
+  }
+
+  return {
+    event: rawResult.value,
+    isNew: !rawResult?.lastErrorObject?.updatedExisting,
+  };
+};
+
+export const deleteEventById = async (id) => {
+  await Events.findByIdAndDelete(id);
+};
