@@ -1,5 +1,5 @@
 import express from 'express';
-import pino from 'pino-http';
+// import pino from 'pino-http';
 import cors from 'cors';
 import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
 import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js';
@@ -10,13 +10,13 @@ export const setupServer = () => {
     const PORT = process.env.PORT;
 
 
-    app.use(
-        pino({
-            transport: {
-                target: 'pino-pretty',
-            },
-        })
-    );
+    // app.use(
+    //     pino({
+    //         transport: {
+    //             target: 'pino-pretty',
+    //         },
+    //     })
+    // );
 
     app.use(cors());
 

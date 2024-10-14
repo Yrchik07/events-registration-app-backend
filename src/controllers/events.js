@@ -5,9 +5,11 @@ import {
   getEvents,
   upsertEvent,
 } from '../services/events.js';
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
 export const getEventsController = async (req, res) => {
-  const events = await getEvents();
+const {page, perPage} = parsePaginationParams(req.query);
+  const events = await getEvents({page, perPage});
   res.json({
     status: 200,
     message: 'Events fetched successfully',
