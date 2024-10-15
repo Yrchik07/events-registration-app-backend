@@ -21,3 +21,4 @@ const eventsSchema = new Schema ({
 }, { timestamps: true });
 
 export const Events = model('Events', eventsSchema);
+

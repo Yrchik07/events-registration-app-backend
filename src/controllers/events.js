@@ -8,8 +8,16 @@ import {
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
 export const getEventsController = async (req, res) => {
-const {page, perPage} = parsePaginationParams(req.query);
-  const events = await getEvents({page, perPage});
+  const { page, perPage } = parsePaginationParams(req.query);
+  const { sortBy, sortOrder } = req.query;
+  const { title, description, eventDate, organizer } = req.query;
+  const filter = {
+    title,
+    description,
+    eventDate,
+    organizer,
+  };
+  const events = await getEvents({ page, perPage, sortBy, sortOrder, filter });
   res.json({
     status: 200,
     message: 'Events fetched successfully',
@@ -40,7 +48,7 @@ export const createEventController = async (req, res) => {
 export const patchEventController = async (req, res) => {
   const { body } = req;
   const { eventId } = req.params;
-  const {event} = await upsertEvent(eventId, body);
+  const { event } = await upsertEvent(eventId, body);
 
   res.status(200).json({
     status: 200,
@@ -51,7 +59,7 @@ export const patchEventController = async (req, res) => {
 export const putEventController = async (req, res) => {
   const { body } = req;
   const { eventId } = req.params;
-  const {isNew, event} = await upsertEvent(eventId, body, {upsert: true});
+  const { isNew, event } = await upsertEvent(eventId, body, { upsert: true });
   const status = isNew ? 201 : 200;
 
   res.status(status).json({
