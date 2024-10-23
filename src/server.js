@@ -3,7 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
 import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js';
-import eventsRouter from './routers/events.js';
+import rootRouter from './routers/index.js';
+import cookieParser from "cookie-parser";
 
 export const setupServer = () => {
     const app = express();
@@ -20,9 +21,11 @@ export const setupServer = () => {
 
     app.use(cors());
 
+    app.use(cookieParser());
+
     app.use(express.json());
 
-    app.use(eventsRouter);
+    app.use(rootRouter);
 
     app.use(notFoundMiddleware);
 

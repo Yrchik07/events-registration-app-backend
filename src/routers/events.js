@@ -21,18 +21,18 @@ const patchEventHandler = ctrWrapper(patchEventController);
 const putEventHandler = ctrWrapper(putEventController);
 const deleteEventHandler = ctrWrapper(deleteEventByIdController);
 
-eventsRouter.use('/events/:eventId', validateMongoId('eventId'));
+eventsRouter.use('/:eventId', validateMongoId('eventId'));
 
-eventsRouter.get('/events', getEventsHandler);
+eventsRouter.get('/', getEventsHandler);
 
-eventsRouter.get('/events/:eventId', getEventByIdHandler);
+eventsRouter.get('/:eventId', getEventByIdHandler);
 
-eventsRouter.post('/events', validateBody(createEventSchema), postEventHandler);
+eventsRouter.post('/', validateBody(createEventSchema), postEventHandler);
 
-eventsRouter.patch('/events/:eventId', validateBody(updateEventSchema), patchEventHandler);
+eventsRouter.patch('/:eventId', validateBody(updateEventSchema), patchEventHandler);
 
-eventsRouter.put('/events/:eventId', validateBody(createEventSchema), putEventHandler);
+eventsRouter.put('/:eventId', validateBody(createEventSchema), putEventHandler);
 
-eventsRouter.delete('/events/:eventId', deleteEventHandler);
+eventsRouter.delete('/:eventId', deleteEventHandler);
 
 export default eventsRouter;

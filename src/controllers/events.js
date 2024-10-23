@@ -5,18 +5,13 @@ import {
   getEvents,
   upsertEvent,
 } from '../services/events.js';
+import { parseFilters } from '../utils/parseFilters.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
 export const getEventsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = req.query;
-  const { title, description, eventDate, organizer } = req.query;
-  const filter = {
-    title,
-    description,
-    eventDate,
-    organizer,
-  };
+  const filter = parseFilters(req.query);
   const events = await getEvents({ page, perPage, sortBy, sortOrder, filter });
   res.json({
     status: 200,
