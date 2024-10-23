@@ -39,5 +39,9 @@ export const logoutUserController = async (req, res) => {
  res.clearCookie('sessionId');
  res.clearCookie('sessionToken');
 
-  res.status(204);
+  res.status(204).json({
+    status: 204,
+    message: 'User is logged out!',
+    data: {},
+  });
 };
