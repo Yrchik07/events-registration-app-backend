@@ -12,7 +12,7 @@ export const getEventsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = req.query;
   const filter = parseFilters(req.query);
-  const events = await getEvents({ page, perPage, sortBy, sortOrder, filter });
+  const events = await getEvents({ page, perPage, sortBy, sortOrder, filter, userId: req.user._id });
   res.json({
     status: 200,
     message: 'Events fetched successfully',
@@ -32,7 +32,7 @@ export const getEventByIdController = async (req, res) => {
 };
 export const createEventController = async (req, res) => {
   const { body } = req;
-  const events = await createEvent(body);
+  const events = await createEvent(body, req.user._id);
 
   res.status(201).json({
     status: 201,

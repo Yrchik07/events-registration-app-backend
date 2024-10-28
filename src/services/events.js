@@ -20,6 +20,7 @@ export const getEvents = async ({
   sortBy = '_id',
   sortOrder = 'asc',
   filter = {},
+  userId,
 }) => {
   const skip = (page - 1) * perPage;
   const eventQuery = Events.find();
@@ -35,6 +36,9 @@ export const getEvents = async ({
   if (filter.organizer) {
     eventQuery.where('organizer', new RegExp(filter.organizer, 'i')); // Фильтрация по организатору (часть имени)
   }
+
+  eventQuery.where('parentId').equals(userId);
+
   const [eventCount, events] = await Promise.all([
     // Events.find().merge(eventQuery).countDocuments(),
     // Events.find()
@@ -65,8 +69,8 @@ export const getEventById = async (id) => {
 
   return event;
 };
-export const createEvent = async (payload) => {
-  const event = await Events.create(payload);
+export const createEvent = async (payload, userId) => {
+  const event = await Events.create({...payload, parentId: userId});
 
   return event;
 };

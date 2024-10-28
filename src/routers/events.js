@@ -13,6 +13,7 @@ import { validateBody } from '../middlewares/validateBody.js';
 import { createEventSchema } from '../validation/createEventSchema.js';
 import { updateEventSchema } from '../validation/updateEventSchema.js';
 import { authenticate } from '../middlewares/authenticate.js';
+import { checkChildPermissions } from '../middlewares/checkRoles.js';
 
 const eventsRouter = Router();
 const getEventsHandler = ctrWrapper(getEventsController);
@@ -31,7 +32,12 @@ eventsRouter.get('/:eventId', getEventByIdHandler);
 
 eventsRouter.post('/', validateBody(createEventSchema), postEventHandler);
 
-eventsRouter.patch('/:eventId', validateBody(updateEventSchema), patchEventHandler);
+eventsRouter.patch(
+  '/:eventId',
+  checkChildPermissions('teacher', 'parent'),
+  validateBody(updateEventSchema),
+  patchEventHandler,
+);
 
 eventsRouter.put('/:eventId', validateBody(createEventSchema), putEventHandler);
 
