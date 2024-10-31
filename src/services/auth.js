@@ -5,8 +5,11 @@ import { Session } from '../db/models/session.js';
 import { createSession } from '../utils/session.js';
 import jwt from 'jsonwebtoken';
 import { env } from '../utils/env.js';
-import { ENV_VARS } from '../constants/index.js';
+import { ENV_VARS, TEMPLATE_DIR } from '../constants/index.js';
 import { sendMail } from '../utils/sendMail.js';
+import Handlebars from 'handlebars';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 export const createUser = async (payload) => {
   const hashedPassword = await bcrypt.hash(payload.password, 10);
@@ -87,6 +90,7 @@ export const sendResetPassword = async (email) => {
   }
   const token = jwt.sign(
     {
+      sub: user._id,
       email,
     },
     env(ENV_VARS.JWT_SECRET),
@@ -94,17 +98,24 @@ export const sendResetPassword = async (email) => {
       expiresIn: '5m',
     },
   );
+
+const templateSourse = await fs.readFile(
+  path.join(TEMPLATE_DIR, 'send-reset-password-email.html'),
+);
+
+const template = Handlebars.compile(templateSourse.toString());
+
+const html = template({
+  name: user.name,
+  link: `${env(
+        ENV_VARS.FRONTEND_HOST)}/reset-password?token=${token}`,
+});
+
   try {
     await sendMail({
-      html: `
-      <h1>Hello!</h1>
-      <p>
-      Here is your reset link <a href="${env(
-        ENV_VARS.FRONTEND_HOST,
-      )}/reset-password?token=${token}">Link</a>
-      </p>`,
+      html,
       to: email,
-      from: env(ENV_VARS.SMTP_USER),
+      from: env(ENV_VARS.SMT_FROM),
       subject: 'Reset your password!',
     });
   } catch (err) {
@@ -112,4 +123,26 @@ export const sendResetPassword = async (email) => {
 
     throw createHttpError(500, 'Problem with sending emails');
   }
+};
+
+export const resetPassword = async ({ token, password }) => {
+  let tokenPayload;
+
+  try {
+    tokenPayload = jwt.verify(token, env(ENV_VARS.JWT_SECRET));
+  } catch (err) {
+    throw createHttpError(401, err.message);
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await User.findOneAndUpdate(
+    {
+      _id: tokenPayload.sub,
+      email: tokenPayload.email,
+    },
+    {
+      password: hashedPassword,
+    },
+  );
 };
