@@ -13,6 +13,9 @@ export const ENV_VARS = {
   SMT_FROM: 'SMT_FROM',
   JWT_SECRET: 'JWT_SECRET',
   FRONTEND_HOST: 'FRONTEND_HOST',
+  BACKEND_HOST: 'BACKEND_HOST',
 };
 
 export const TEMPLATE_DIR = path.join(process.cwd(), 'src', 'templates');
+export const TEMP_UPLOAD_DIR = path.join(process.cwd(), 'temp');
+export const UPLOAD_DIR = path.join(process.cwd(), 'upload');

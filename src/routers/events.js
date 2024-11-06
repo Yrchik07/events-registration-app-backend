@@ -14,6 +14,7 @@ import { createEventSchema } from '../validation/createEventSchema.js';
 import { updateEventSchema } from '../validation/updateEventSchema.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { checkChildPermissions } from '../middlewares/checkRoles.js';
+import { upload } from '../validation/uploader.js';
 
 const eventsRouter = Router();
 const getEventsHandler = ctrWrapper(getEventsController);
@@ -30,7 +31,12 @@ eventsRouter.get('/', getEventsHandler);
 
 eventsRouter.get('/:eventId', getEventByIdHandler);
 
-eventsRouter.post('/', validateBody(createEventSchema), postEventHandler);
+eventsRouter.post(
+  '/',
+  upload.single('avatar'),
+  validateBody(createEventSchema),
+  postEventHandler,
+);
 
 eventsRouter.patch(
   '/:eventId',

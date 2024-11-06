@@ -19,6 +19,7 @@ const eventsSchema = new Schema(
       required: true,
     },
     parentId: { type: Schema.ObjectId, required: true },
+    avatarUrl: { type: String },
   },
   { timestamps: true, versionKey: false },
 );

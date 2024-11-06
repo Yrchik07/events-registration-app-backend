@@ -1,5 +1,6 @@
 import createHttpError from 'http-errors';
 import { Events } from '../db/models/events.js';
+import { saveFileToLocalMachine } from '../utils/saveFileToLocalMachine.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -64,16 +65,27 @@ export const getEventById = async (id) => {
   const event = await Events.findById(id);
 
   if (!event) {
-    throw createHttpError(404, 'Event not found or you are not authorized to view it');
+    throw createHttpError(
+      404,
+      'Event not found or you are not authorized to view it',
+    );
   }
 
   return event;
 };
-export const createEvent = async (payload, userId) => {
-  const event = await Events.create({...payload, parentId: userId});
 
+// export const createEvent = async ({...payload}, userId) => {
+export const createEvent = async ({ avatar, ...payload }, userId) => {
+  const url = await saveFileToLocalMachine(avatar);
+  const event = await Events.create({
+    ...payload,
+    parentId: userId,
+    avatarUrl: url,
+  });
   return event;
 };
+
+
 export const upsertEvent = async (id, payload, options = {}) => {
   const rawResult = await Events.findByIdAndUpdate(id, payload, {
     new: true,
@@ -82,7 +94,10 @@ export const upsertEvent = async (id, payload, options = {}) => {
   });
 
   if (!rawResult || !rawResult.value) {
-    throw createHttpError(404, 'Event not found or you are not authorized to update it');
+    throw createHttpError(
+      404,
+      'Event not found or you are not authorized to update it',
+    );
   }
 
   return {

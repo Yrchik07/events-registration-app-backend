@@ -31,8 +31,10 @@ export const getEventByIdController = async (req, res) => {
   });
 };
 export const createEventController = async (req, res) => {
-  const { body } = req;
-  const events = await createEvent(body, req.user._id);
+  const { body, file } = req;
+  // const { body } = req;
+  const events = await createEvent({...body, avatar: file}, req.user._id);
+  // const events = await createEvent(body, req.user._id);
 
   res.status(201).json({
     status: 201,
@@ -40,6 +42,7 @@ export const createEventController = async (req, res) => {
     data: events,
   });
 };
+
 export const patchEventController = async (req, res) => {
   const { body } = req;
   const { eventId } = req.params;
