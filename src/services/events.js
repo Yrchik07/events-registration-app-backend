@@ -1,6 +1,6 @@
 import createHttpError from 'http-errors';
 import { Events } from '../db/models/events.js';
-import { saveFileToLocalMachine } from '../utils/saveFileToLocalMachine.js';
+import { saveFile } from '../utils/saveFile.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -41,9 +41,7 @@ export const getEvents = async ({
   eventQuery.where('parentId').equals(userId);
 
   const [eventCount, events] = await Promise.all([
-    // Events.find().merge(eventQuery).countDocuments(),
-    // Events.find()
-    eventQuery.clone().countDocuments(), // Считаем общее количество событий
+    eventQuery.clone().countDocuments(),
     eventQuery
       .skip(skip)
       .limit(perPage)
@@ -74,9 +72,8 @@ export const getEventById = async (id) => {
   return event;
 };
 
-// export const createEvent = async ({...payload}, userId) => {
 export const createEvent = async ({ avatar, ...payload }, userId) => {
-  const url = await saveFileToLocalMachine(avatar);
+  const url = await saveFile(avatar);
   const event = await Events.create({
     ...payload,
     parentId: userId,
@@ -85,13 +82,18 @@ export const createEvent = async ({ avatar, ...payload }, userId) => {
   return event;
 };
 
+export const upsertEvent = async (id, { avatar, ...payload }, options = {}) => {
+  const url = await saveFile(avatar);
 
-export const upsertEvent = async (id, payload, options = {}) => {
-  const rawResult = await Events.findByIdAndUpdate(id, payload, {
-    new: true,
-    includeResultMetadata: true,
-    ...options,
-  });
+  const rawResult = await Events.findByIdAndUpdate(
+    id,
+    { ...payload, avatarUrl: url },
+    {
+      new: true,
+      includeResultMetadata: true,
+      ...options,
+    },
+  );
 
   if (!rawResult || !rawResult.value) {
     throw createHttpError(

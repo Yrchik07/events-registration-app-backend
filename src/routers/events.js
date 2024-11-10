@@ -41,11 +41,17 @@ eventsRouter.post(
 eventsRouter.patch(
   '/:eventId',
   checkChildPermissions('teacher', 'parent'),
+  upload.single('avatar'),
   validateBody(updateEventSchema),
   patchEventHandler,
 );
 
-eventsRouter.put('/:eventId', validateBody(createEventSchema), putEventHandler);
+eventsRouter.put(
+  '/:eventId',
+  upload.single('avatar'),
+  validateBody(createEventSchema),
+  putEventHandler,
+);
 
 eventsRouter.delete('/:eventId', deleteEventHandler);
 

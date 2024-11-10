@@ -12,7 +12,14 @@ export const getEventsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = req.query;
   const filter = parseFilters(req.query);
-  const events = await getEvents({ page, perPage, sortBy, sortOrder, filter, userId: req.user._id });
+  const events = await getEvents({
+    page,
+    perPage,
+    sortBy,
+    sortOrder,
+    filter,
+    userId: req.user._id,
+  });
   res.json({
     status: 200,
     message: 'Events fetched successfully',
@@ -32,9 +39,7 @@ export const getEventByIdController = async (req, res) => {
 };
 export const createEventController = async (req, res) => {
   const { body, file } = req;
-  // const { body } = req;
-  const events = await createEvent({...body, avatar: file}, req.user._id);
-  // const events = await createEvent(body, req.user._id);
+  const events = await createEvent({ ...body, avatar: file }, req.user._id);
 
   res.status(201).json({
     status: 201,
@@ -44,9 +49,9 @@ export const createEventController = async (req, res) => {
 };
 
 export const patchEventController = async (req, res) => {
-  const { body } = req;
+  const { body, file } = req;
   const { eventId } = req.params;
-  const { event } = await upsertEvent(eventId, body);
+  const { event } = await upsertEvent(eventId, {...body, avatar: file});
 
   res.status(200).json({
     status: 200,
@@ -55,9 +60,13 @@ export const patchEventController = async (req, res) => {
   });
 };
 export const putEventController = async (req, res) => {
-  const { body } = req;
+  const { body, file } = req;
   const { eventId } = req.params;
-  const { isNew, event } = await upsertEvent(eventId, body, { upsert: true });
+  const { isNew, event } = await upsertEvent(
+    eventId,
+    { ...body, avatar: file },
+    { upsert: true },
+  );
   const status = isNew ? 201 : 200;
 
   res.status(status).json({

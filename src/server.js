@@ -5,6 +5,7 @@ import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
 import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js';
 import rootRouter from './routers/index.js';
 import cookieParser from "cookie-parser";
+import { UPLOAD_DIR } from './constants/index.js';
 
 export const setupServer = () => {
     const app = express();
@@ -24,6 +25,8 @@ export const setupServer = () => {
     app.use(cookieParser());
 
     app.use(express.json());
+
+    app.use('/upload', express.static(UPLOAD_DIR));
 
     app.use(rootRouter);
 
