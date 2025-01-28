@@ -99,17 +99,16 @@ export const sendResetPassword = async (email) => {
     },
   );
 
-const templateSourse = await fs.readFile(
-  path.join(TEMPLATE_DIR, 'send-reset-password-email.html'),
-);
+  const templateSourse = await fs.readFile(
+    path.join(TEMPLATE_DIR, 'send-reset-password-email.html'),
+  );
 
-const template = Handlebars.compile(templateSourse.toString());
+  const template = Handlebars.compile(templateSourse.toString());
 
-const html = template({
-  name: user.name,
-  link: `${env(
-        ENV_VARS.FRONTEND_HOST)}/reset-password?token=${token}`,
-});
+  const html = template({
+    name: user.name,
+    link: `${env(ENV_VARS.FRONTEND_HOST)}/reset-password?token=${token}`,
+  });
 
   try {
     await sendMail({
@@ -145,4 +144,35 @@ export const resetPassword = async ({ token, password }) => {
       password: hashedPassword,
     },
   );
+};
+
+
+export const loginOrSignupWithGoogleOAuth = async (code) => {
+  const payload = await validateGoogleOAuthCode(code);
+
+  if (!payload) throw createHttpError(401);
+
+  let user = await User.findOne({ email: payload.email });
+
+  if (!user) {
+    const hashedPassword = await bcrypt.hash(
+      crypto.randomBytes(40).toString('base64'),
+      10,
+    );
+
+    user = await User.create({
+      name: payload.given_name + ' ' + payload.family_name,
+      email: payload.email,
+      password: hashedPassword,
+    });
+  }
+
+  await Session.deleteOne({
+    userId: user._id,
+  });
+
+  return await Session.create({
+    userId: user._id,
+    ...createSession(),
+  });
 };
