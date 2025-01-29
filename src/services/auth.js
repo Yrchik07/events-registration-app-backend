@@ -10,6 +10,7 @@ import { sendMail } from '../utils/sendMail.js';
 import Handlebars from 'handlebars';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { validateGoogleOAuthCode } from '../utils/googleOAuth.js';
 
 export const createUser = async (payload) => {
   const hashedPassword = await bcrypt.hash(payload.password, 10);
